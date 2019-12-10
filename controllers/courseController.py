@@ -1,9 +1,9 @@
 from flask import request, Blueprint
-import pymysql
 import json
 import time
 
-from config.conf import *
+from utils.mysql import *
+
 
 # 建立蓝图
 course = Blueprint(name='course', import_name=__name__)
@@ -28,7 +28,7 @@ def getCourseIntroduction():
         、编码和测试等阶段的主要思想和技术方法，并且能够利用所学知识进行各种软件项目的实际开发实践。"
     }
 
-    db = pymysql.connect(SQL_HOST, USERNAME, PASSWORD, DATABASE)
+    db = getDatabaseConnection()
     cursor = db.cursor()
 
     # 使用预处理语句创建表

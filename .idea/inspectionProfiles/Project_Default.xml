@@ -13,6 +13,7 @@
         <list>
           <option value="id" />
           <option value="type" />
+          <option value="dict" />
         </list>
       </option>
     </inspection_tool>
