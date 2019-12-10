@@ -19,6 +19,15 @@ class TransportCmd:
     QuitLesson = 117
 
 
+class ErrorCode:
+    NoError = 0
+    InSpeechError = 1
+    ApplyingError = 2
+    AccountTypeError = 3
+    AccountNotFoundError = 4
+    PasswordError = 5
+
+
 class CourseStatus:
     OffLine = 0
     OnLine = 1
@@ -54,7 +63,11 @@ class AccountType:
     Student = 1
 
 
-class RaiseHandError:
-    NoError = 0
-    InSpeechError = 1
-    ApplyingError = 2
+class Emotion:
+    Angry = 0
+    Disgust = 1
+    Fear = 2
+    Happy = 3
+    Sad = 4
+    Surprise = 5
+    Neutral = 6

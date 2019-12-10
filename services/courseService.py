@@ -1,5 +1,4 @@
 from utils.mysql import *
-from models.joinCourse import JoinCourse
 
 
 class CourseService:
