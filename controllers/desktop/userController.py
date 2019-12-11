@@ -30,14 +30,11 @@ def loginPC():
         course_service = CourseService()
         course_list = course_service.getCourseBasicListByUid(uid=user_obj.id)
 
-        return_data = {
-            "error_code": err,
-            "user_pic": "NULL",
-            "uid": user_obj.id,
-            "username": user_obj.name,
-            "account_type": user_obj.type,
-            "course_list": course_list,
-            "user_status": user_obj.status
-        }
-
+        return_data["user_pic"] = "NULL"
+        return_data["uid"] = user_obj.id
+        return_data["username"] = user_obj.name
+        return_data["account_type"] = user_obj.type
+        return_data["course_list"] = course_list
+        return_data["user_status"] = user_obj.status
+    print(return_data)
     return return_data

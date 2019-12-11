@@ -10,14 +10,22 @@ from services.courseService import CourseService
 course = Blueprint(name='course', import_name=__name__)
 
 
-@course.route('/getCourseBaseInfo', methods=['POST'])
-def getCourseBaseInfo():
+@course.route('/getCourseBasicInfo', methods=['POST'])
+def getCourseBasicInfo():
+    request_data = json.loads(request.form["json"])
+
+    course_service = CourseService()
+    course_obj, err = course_service.getCourseByCourseId(course_id=request_data["course_id"])
     return_data = {
-        "course_id": json.loads(request.form["json"])["course_id"],
-        "create_timestamp": int(time.time())
+        "error_code": err,
+        "course_id": None,
+        "create_timestamp": None
     }
 
-    print(json.loads(request.form["json"]))
+    if course_obj is not None:
+        return_data["course_id"] = course_obj.id
+        return_data["create_timestamp"] = course_obj.create_timestamp
+    print(return_data)
     return return_data
 
 
@@ -82,6 +90,20 @@ def uploadCourseResource():
                                                          uploader_id=request_data["uid"],
                                                          path=file_relative_path,
                                                          size=request_data["file_size"])
+
+    return_data = {
+        "error_code": err
+    }
+
+    return return_data
+
+
+@course.route('/deleteCourseResource', methods=['POST'])
+def deleteCourseResource():
+    request_data = json.loads(request.form["json"])
+
+    course_service = CourseService()
+    res, err = course_service.deleteCourseResourceRecordByFileId(file_id=request_data["file_id"])
 
     return_data = {
         "error_code": err

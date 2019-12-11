@@ -2,6 +2,7 @@ import time
 
 from utils.mysql import *
 from static.edu import *
+from models.course import Course
 from models.courseResource import CourseResource
 
 
@@ -10,6 +11,28 @@ class CourseService:
         # 连接数据库
         self.conn = getDatabaseConnection()
         self.cursor = self.conn.cursor()
+
+    def getCourseByCourseId(self, course_id):
+        """
+            获取课程模型
+        :param course_id: 课程id
+        :return: 存在返回course对象，否则返回None
+        """
+        sql = "SELECT * FROM course WHERE id=%s"
+        self.cursor.execute(sql, course_id)
+        res = self.cursor.fetchall()
+
+        course = None
+        err = ErrorCode.NoError
+        if len(res) == 0:
+            err = ErrorCode.ResourceNotFoundError
+        else:
+            dict = res[0]  # 返回是一个列表，取第一个（也只有一个）
+            course = Course(id=str(dict["id"]), name=dict["name"], key=dict["key"],
+                            creator_id=str(dict["creator_id"]), create_timestamp=dict["create_timestamp"],
+                            status=dict["status"], notice=dict["notice"], introduction=dict["introduction"],
+                            joinable=dict["joinable"])
+        return course, err
 
     def getCourseBasicListByUid(self, uid):
         """
@@ -63,6 +86,33 @@ class CourseService:
                                              path=dict["path"])
         except pymysql.err.IntegrityError:  # 完整性约束，course_id与tile的唯一性约束
             err = ErrorCode.ResourceTitleDuplicateError
+
+        return course_resource, err
+
+    def deleteCourseResourceRecordByFileId(self, file_id):
+        """
+            移除某一课程资源
+            仅移除数据库中的记录
+        :param file_id: 需要删除的文件（或资源）id
+        :return:
+        """
+        sql = "SELECT * FROM course_resource WHERE id=%s"
+        self.cursor.execute(sql, file_id)
+        res = self.cursor.fetchall()
+
+        course_resource = None
+        err = ErrorCode.NoError
+        if len(res) == 0:
+            err = ErrorCode.ResourceNotFoundError
+        else:
+            dict = res[0]
+            course_resource = CourseResource(id=str(dict["id"]), course_id=dict["course_id"], title=dict["title"],
+                                             filename=dict["filename"], type=dict["type"],
+                                             upload_timestamp=dict["upload_timestamp"], uploader_id=dict["uploader_id"],
+                                             path=dict["path"])
+
+            sql = "DELETE FROM course_resource WHERE id=%s"
+            self.cursor.execute(sql, file_id)
 
         return course_resource, err
 

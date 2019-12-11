@@ -29,6 +29,7 @@ class UserService:
             err = ErrorCode.AccountNotFoundError
         else:
             dict = res[0]  # 返回是一个列表，取第一个（也只有一个）
+
             if dict["type"] != account_type:
                 err = ErrorCode.AccountTypeError
             elif dict["pwd"] != pwd:
