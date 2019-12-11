@@ -34,7 +34,7 @@ class UserService:
             elif dict["pwd"] != pwd:
                 err = ErrorCode.PasswordError
             else:
-                user = User(id=dict["id"], open_id=dict["open_id"], account=dict["account"],
+                user = User(id=str(dict["id"]), open_id=dict["open_id"], account=dict["account"],
                             name=dict["name"], type=dict["type"],  phone_num=dict["phone_num"],
                             pwd=dict["pwd"],  create_timestamp=dict["create_timestamp"], status=dict["status"])
 

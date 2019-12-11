@@ -1,8 +1,8 @@
 from flask import Flask
 
 from config.conf import *
-from controllers.courseController import course
-from controllers.userController import user
+from controllers.desktop.courseController import course
+from controllers.desktop.userController import user
 
 app = Flask(__name__)
 # 注册蓝图

@@ -1,9 +1,10 @@
 from flask import request, Blueprint
 import json
 import time
+import os
 
-from utils.mysql import *
-
+from config.conf import *
+from services.courseService import CourseService
 
 # 建立蓝图
 course = Blueprint(name='course', import_name=__name__)
@@ -28,13 +29,6 @@ def getCourseIntroduction():
         、编码和测试等阶段的主要思想和技术方法，并且能够利用所学知识进行各种软件项目的实际开发实践。"
     }
 
-    db = getDatabaseConnection()
-    cursor = db.cursor()
-
-    # 使用预处理语句创建表
-    sql = "CREATE TABLE EMPLOYEE (FIRST_NAME  CHAR(20) NOT NULL,LAST_NAME  CHAR(20),AGE INT,SEX CHAR(1),INCOME FLOAT )"
-    cursor.execute(sql)
-
     print(request.form["json"])
 
     return return_data
@@ -53,35 +47,44 @@ def getCourseNotice():
 
 @course.route('/getCourseResourceList', methods=['POST'])
 def getCourseResourceList():
-    return_data = {
-        "file_info_list": [
-            {"file_id": "1001", "filename": "语文.pdf", "upload_timestamp": 1575301104, "uploader": "教师",
-             "file_size": 213123},
-            {"file_id": "1001", "filename": "专业.ppt", "upload_timestamp": 1575301104, "uploader": "教师",
-             "file_size": 213123},
-            {"file_id": "1001", "filename": "撒旦撒.docx", "upload_timestamp": 1575301104, "uploader": "教师",
-             "file_size": 213123},
-            {"file_id": "1001", "filename": "阿松大沙发沙发.doc", "upload_timestamp": 1575301104, "uploader": "教师",
-             "file_size": 213123},
-            {"file_id": "1001", "filename": "啊发撒法沙发沙发.jpg", "upload_timestamp": 1575301104, "uploader": "教师",
-             "file_size": 213123},
-            {"file_id": "1001", "filename": "pycharm.exe", "upload_timestamp": 1575301104, "uploader": "教师",
-             "file_size": 213123}
-        ]
-    }
+    request_data = json.loads(request.form["json"])
 
-    print(request.form["json"])
+    course_service = CourseService()
+    res, err = course_service.getCourseResourceListByCourseId(course_id=request_data["course_id"])
+    return_data = {
+        "error_code": err,
+        "file_info_list": res
+    }
 
     return return_data
 
 
 @course.route('/uploadCourseResource', methods=['POST'])
 def uploadCourseResource():
-    return_data = {
-        "upload_status": ""
-    }
+    request_data = json.loads(request.form["json"])
+    request_file = request.files["file"]
 
-    print(request.form["json"])
-    request.files["file"].save(request.files["file"].filename)
+    # 存储的相对路径
+    relative_path = request_data["course_id"] + "/" + request_data["resource_title"]
+    absolute_path = COURSE_RESOURCE_PATH + "/" + relative_path
+    # 检测路径是否存在，不存在则创建
+    if not os.path.exists(absolute_path):
+        os.makedirs(absolute_path)
+
+    file_relative_path = relative_path + "/" + request_data["filename"]
+    file_absolute_path = COURSE_RESOURCE_PATH + "/" + file_relative_path
+    request_file.save(file_absolute_path)
+
+    course_service = CourseService()
+    res, err = course_service.insertCourseResourceRecord(course_id=request_data["course_id"],
+                                                         title=request_data["resource_title"],
+                                                         filename=request_data["filename"],
+                                                         uploader_id=request_data["uid"],
+                                                         path=file_relative_path,
+                                                         size=request_data["file_size"])
+
+    return_data = {
+        "error_code": err
+    }
 
     return return_data

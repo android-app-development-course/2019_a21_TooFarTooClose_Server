@@ -8,4 +8,5 @@ def getDatabaseConnection():
                            user=USERNAME,
                            passwd=PASSWORD,
                            db=DATABASE,
-                           cursorclass=pymysql.cursors.DictCursor)
+                           cursorclass=pymysql.cursors.DictCursor,
+                           autocommit=True)

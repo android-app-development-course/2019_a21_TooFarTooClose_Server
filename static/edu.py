@@ -26,6 +26,7 @@ class ErrorCode:
     AccountTypeError = 3
     AccountNotFoundError = 4
     PasswordError = 5
+    ResourceTitleDuplicateError = 6
 
 
 class CourseStatus:
