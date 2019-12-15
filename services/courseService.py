@@ -27,10 +27,10 @@ class CourseService:
             err = ErrorCode.CourseResourceNotFoundError
         else:
             dict = res[0]  # 返回是一个列表，取第一个（也只有一个）
-            course = Course(id=str(dict["id"]), name=dict["name"], key=dict["key"],
+            course = Course(id=str(dict["id"]), name=dict["name"], key=dict["key"], classify=dict["classify"],
                             creator_id=str(dict["creator_id"]), create_timestamp=dict["create_timestamp"],
                             status=dict["status"], notice=dict["notice"], introduction=dict["introduction"],
-                            joinable=dict["joinable"])
+                            joinable=dict["joinable"], pic_path=dict["pic_path"])
         return course, err
 
     def getCourseBasicListByUid(self, uid):
@@ -44,10 +44,62 @@ class CourseService:
                     |-course_id
                     |-course_name
         """
+        err = ErrorCode.NoError
         sql = "SELECT CAST(id AS CHAR) AS course_id, name AS course_name " \
               "FROM course " \
               "WHERE id IN (SELECT course_id FROM join_course WHERE uid=%s)"
         self.cursor.execute(sql, uid)
         res = self.cursor.fetchall()
 
-        return res
+        return res, err
+    
+    def insertCourse(self, course_name, classify, creator_id, introduction):
+        """
+            创建一个课程
+            :param course_name: 课程名
+            :param classify: 课程分类
+            :param creator_id: 创建人id
+            :param introduction: 课程介绍
+            :return: 插入成功返回course对象，否则返回None
+        """
+        if introduction == "":
+            introduction = "null_str"
+
+        create_timestamp = int(time.time())
+        sql = "INSERT INTO " \
+              "course (name, classify, creator_id, introduction, create_timestamp) " \
+              "VALUES (%s, %s, %s, %s, %s)"
+        self.cursor.execute(sql, (course_name, classify, creator_id, introduction, create_timestamp))
+
+        sql = "SELECT * FROM course WHERE creator_id=%s AND create_timestamp=%s"
+        self.cursor.execute(sql, (creator_id, create_timestamp))
+        res = self.cursor.fetchall()
+        dict = res[0]
+        course = Course(id=str(dict["id"]), name=dict["name"], key=dict["key"],
+                        classify=dict["classify"], creator_id=str(dict["creator_id"]),
+                        create_timestamp=dict["create_timestamp"], status=dict["status"],
+                        notice=dict["notice"], introduction=dict["introduction"],
+                        joinable=dict["joinable"], pic_path=dict["pic_path"])
+        err = ErrorCode.NoError
+
+        return course, err
+
+    def updateCoursePicture(self, course_id, path):
+        sql = "UPDATE course SET pic_path=%s WHERE id=%s"
+        self.cursor.execute(sql, (path, course_id))
+
+        sql = "SELECT * FROM course WHERE id=%s"
+        self.cursor.execute(sql, course_id)
+        res = self.cursor.fetchall()
+        dict = res[0]
+        course = Course(id=str(dict["id"]), name=dict["name"], key=dict["key"],
+                        classify=dict["classify"], creator_id=str(dict["creator_id"]),
+                        create_timestamp=dict["create_timestamp"], status=dict["status"],
+                        notice=dict["notice"], introduction=dict["introduction"],
+                        joinable=dict["joinable"], pic_path=dict["pic_path"])
+        err = ErrorCode.NoError
+
+        return course, err
+
+
+

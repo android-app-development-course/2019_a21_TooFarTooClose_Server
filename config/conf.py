@@ -8,5 +8,6 @@ USERNAME = "root"
 PASSWORD = "jiduwuyu"
 DATABASE = "status_online_education"
 
-# course resource file
+# path
 COURSE_RESOURCE_PATH = "C:/Users/10635/Desktop/CourseResourceFile"
+COURSE_PICTURE_PATH = "C:/Users/10635/Desktop/CoursePicture"

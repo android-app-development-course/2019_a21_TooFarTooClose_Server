@@ -35,7 +35,7 @@ class CourseResourceService:
 
         return course_resource, err
 
-    def insertCourseResourceRecord(self, course_id, title, filename, uploader_id, path, size):
+    def insertCourseResource(self, course_id, title, filename, uploader_id, path, size):
         """
             插入一条课程资源记录
             注意course_resource表有course_id与tile的唯一性约束
@@ -72,7 +72,7 @@ class CourseResourceService:
 
         return course_resource, err
 
-    def deleteCourseResourceRecordByFileId(self, file_id):
+    def deleteCourseResourceByFileId(self, file_id):
         """
             移除某一课程资源
             仅移除数据库中的记录

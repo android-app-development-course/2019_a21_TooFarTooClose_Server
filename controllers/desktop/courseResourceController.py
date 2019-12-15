@@ -11,6 +11,17 @@ courseResource = Blueprint(name='courseResource', import_name=__name__)
 
 @courseResource.route('/getCourseResourceList', methods=['POST'])
 def getCourseResourceList():
+    """
+        获取课程资源列表
+        Params:
+        {int}account_type
+        {string}uid
+        {string}username
+        {string}course_id
+    :return:
+        {int}error_code
+        {json}file_info_list
+    """
     request_data = json.loads(request.form["json"])
 
     course_resource_service = CourseResourceService()
@@ -25,6 +36,16 @@ def getCourseResourceList():
 
 @courseResource.route('/downloadCourseResource', methods=['POST'])
 def downloadCourseResource():
+    """
+        下载课程资源
+        Params:
+        {int}account_type
+        {string}uid
+        {string}username
+        {string}file_id
+    :return:
+        file
+    """
     request_data = json.loads(request.form["json"])
 
     course_resource_service = CourseResourceService()
@@ -39,6 +60,19 @@ def downloadCourseResource():
 
 @courseResource.route('/uploadCourseResource', methods=['POST'])
 def uploadCourseResource():
+    """
+        上传课程资源
+        Params:
+        {int}account_type
+        {string}uid
+        {string}username
+        {string}course_id
+        {string}resource_title
+        {string}filename
+        {string}file_size
+    :return:
+        {int}error_code
+    """
     request_data = json.loads(request.form["json"])
     request_file = request.files["file"]
 
@@ -54,12 +88,12 @@ def uploadCourseResource():
     request_file.save(file_absolute_path)
 
     course_resource_service = CourseResourceService()
-    res, err = course_resource_service.insertCourseResourceRecord(course_id=request_data["course_id"],
-                                                                  title=request_data["resource_title"],
-                                                                  filename=request_data["filename"],
-                                                                  uploader_id=request_data["uid"],
-                                                                  path=file_relative_path,
-                                                                  size=request_data["file_size"])
+    res, err = course_resource_service.insertCourseResource(course_id=request_data["course_id"],
+                                                            title=request_data["resource_title"],
+                                                            filename=request_data["filename"],
+                                                            uploader_id=request_data["uid"],
+                                                            path=file_relative_path,
+                                                            size=request_data["file_size"])
 
     return_data = {
         "error_code": err
@@ -70,10 +104,20 @@ def uploadCourseResource():
 
 @courseResource.route('/deleteCourseResource', methods=['POST'])
 def deleteCourseResource():
+    """
+        删除课程资源
+        Params:
+        {int}account_type
+        {string}uid
+        {string}username
+        {string}file_id
+    :return:
+        {int}error_code
+    """
     request_data = json.loads(request.form["json"])
 
     course_resource_service = CourseResourceService()
-    res, err = course_resource_service.deleteCourseResourceRecordByFileId(file_id=request_data["file_id"])
+    res, err = course_resource_service.deleteCourseResourceByFileId(file_id=request_data["file_id"])
 
     return_data = {
         "error_code": err

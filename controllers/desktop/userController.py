@@ -10,6 +10,21 @@ user = Blueprint(name='user', import_name=__name__)
 
 @user.route('/loginPC', methods=['POST'])
 def loginPC():
+    """
+        获取课程资源列表
+        Params:
+        {int}account_type
+        {string}account
+        {string}pwd
+    :return:
+        {int}error_code
+        {string}user_pic_url
+        {string}uid
+        {string}username
+        {int}account_type
+        {json}course_list
+        {int}user_status
+    """
     request_data = json.loads(request.form["json"])
 
     user_service = UserService()
@@ -19,7 +34,7 @@ def loginPC():
 
     return_data = {
         "error_code": err,
-        "user_pic": None,
+        "user_pic_url": None,
         "uid": None,
         "username": None,
         "account_type": None,
@@ -28,7 +43,7 @@ def loginPC():
     }
     if user_obj is not None:
         course_service = CourseService()
-        course_list = course_service.getCourseBasicListByUid(uid=user_obj.id)
+        course_list, err = course_service.getCourseBasicListByUid(uid=user_obj.id)
 
         return_data["user_pic"] = "NULL"
         return_data["uid"] = user_obj.id
@@ -36,5 +51,30 @@ def loginPC():
         return_data["account_type"] = user_obj.type
         return_data["course_list"] = course_list
         return_data["user_status"] = user_obj.status
-    print(return_data)
+
+    return return_data
+
+
+@user.route('/getCourseList', methods=['POST'])
+def getCourseList():
+    """
+        获取课程资源列表
+        Params:
+        {int}account_type
+        {string}uid
+        {string}username
+    :return:
+        {int}error_code
+        {json}course_list
+    """
+    request_data = json.loads(request.form["json"])
+
+    course_service = CourseService()
+    course_list, err = course_service.getCourseBasicListByUid(request_data["uid"])
+
+    return_data = {
+        "error_code": err,
+        "course_list": course_list
+    }
+
     return return_data
